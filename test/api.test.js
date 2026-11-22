@@ -58,6 +58,14 @@ describe("Transcript API", () => {
     assert.equal(response.status, 404);
   });
 
+  test("BUG-103: /studentids ignores case and surrounding whitespace", async () => {
+    await call("POST", "/transcripts", { name: "Grace Lee" });
+
+    const response = await call("GET", "/studentids?name=%20grace%20lee%20");
+
+    assert.deepEqual(response.body, [1]);
+  });
+
   test("BUG-102: posting a second grade for a course returns 409", async () => {
     await call("POST", "/transcripts", { name: "Lin" });
     await call("POST", "/transcripts/1/cs360", { grade: 85 });
