@@ -53,6 +53,10 @@ export class TranscriptStore {
     }
 
     const studentGrades = this.#grades.get(parsedID) ?? new Map();
+    // BUG-102: a course can only be graded once; changeGrade() is for corrections.
+    if (studentGrades.has(normalizedCourse)) {
+      throw new Error(`Grade already exists for course ${normalizedCourse}`);
+    }
     studentGrades.set(normalizedCourse, numericGrade);
     this.#grades.set(parsedID, studentGrades);
     return { studentID: parsedID, course: normalizedCourse, grade: numericGrade };
