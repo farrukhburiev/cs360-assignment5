@@ -86,4 +86,21 @@ describe("TranscriptStore", () => {
 
     assert.equal(store.getGrade(studentID, "CS360"), undefined);
   });
+
+  test("REF-201: addGrade and changeGrade apply the same course and grade rules", () => {
+    const studentID = store.addStudent("Ada");
+    store.addGrade(studentID, "CS360", 80);
+    const saveGrade = [
+      (course, grade) => store.addGrade(studentID, course, grade),
+      (course, grade) => store.changeGrade(studentID, course, grade),
+    ];
+
+    for (const save of saveGrade) {
+      assert.throws(() => save("   ", 90), /Course name is required/);
+      assert.throws(() => save("CS101", 85.5), /Grade must be an integer from 0 to 100/);
+      assert.throws(() => save("CS101", -1), /Grade must be an integer from 0 to 100/);
+      assert.throws(() => save("CS101", "abc"), /Grade must be an integer from 0 to 100/);
+    }
+    assert.equal(store.getGrade(studentID, "  "), undefined);
+  });
 });
