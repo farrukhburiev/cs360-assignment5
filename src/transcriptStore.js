@@ -15,9 +15,11 @@ export class TranscriptStore {
   }
 
   getStudentIDs(name) {
+    // BUG-103: compare trimmed, lower-case names; the stored display name stays untouched.
+    const searchName = name === undefined ? undefined : String(name).trim().toLowerCase();
     const matches = [];
     for (const student of this.#students.values()) {
-      if (name === undefined || student.studentName === String(name)) {
+      if (searchName === undefined || student.studentName.toLowerCase() === searchName) {
         matches.push(student.studentID);
       }
     }
