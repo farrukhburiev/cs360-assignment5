@@ -67,4 +67,14 @@ describe("Transcript API", () => {
     assert.equal(response.status, 409);
     assert.deepEqual(response.body, { error: "Grade already exists for course CS360" });
   });
+
+  test("BUG-101: a deleted student's grade request returns 404", async () => {
+    await call("POST", "/transcripts", { name: "Ada" });
+    await call("POST", "/transcripts/1/cs360", { grade: 85 });
+    assert.equal((await call("DELETE", "/transcripts/1")).status, 204);
+
+    const response = await call("GET", "/transcripts/1/cs360");
+
+    assert.equal(response.status, 404);
+  });
 });
