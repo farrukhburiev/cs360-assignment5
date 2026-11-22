@@ -57,4 +57,12 @@ describe("Transcript API", () => {
     const response = await call("GET", "/nothing-here");
     assert.equal(response.status, 404);
   });
+
+  test("BUG-103: /studentids ignores case and surrounding whitespace", async () => {
+    await call("POST", "/transcripts", { name: "Grace Lee" });
+
+    const response = await call("GET", "/studentids?name=%20grace%20lee%20");
+
+    assert.deepEqual(response.body, [1]);
+  });
 });
